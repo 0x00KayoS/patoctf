@@ -328,7 +328,9 @@ Tive que deixar uma mensagem :)
 
 vi q tinha NX e fui pesquisar sobre "ELF binary exploitation NX bypass" e vi um termo um pouco familiar "ret2libc", 
 
-pesquisando mais sobre encontrei o seguinte blog: https://sploitfun.wordpress.com/2015/05/08/bypassing-nx-bit-using-return-to-libc/
+sabia que estava no caminho certo por me ter sido dado o libc.so.6 por algum motivo...
+
+Pesquisando mais sobre encontrei o seguinte blog: https://sploitfun.wordpress.com/2015/05/08/bypassing-nx-bit-using-return-to-libc/
 
 mas eu queria mais, procurando no YT por videos de ret2libc até que encontrei: https://www.youtube.com/watch?v=tMN5N5oid2c
 
@@ -336,11 +338,11 @@ mas eu queria mais, procurando no YT por videos de ret2libc até que encontrei: 
 
 O que instalar:
 
-gbg gef - https://github.com/hugsy/gef
+- gdb gef - https://github.com/hugsy/gef
 
-pwntools (pip3 install pwn)
+- pwntools (pip3 install pwn)
 
-pwninit - https://github.com/io12/pwninit/releases/download/3.3.1/pwninit
+- pwninit - https://github.com/io12/pwninit/releases/download/3.3.1/pwninit
 
 
 Depois de baixar o binário e a lib:

